@@ -11,7 +11,7 @@ var animations = new Array();
 	animations[9] = [348,30,16,24]; //look up right
 	animations[10] = [112,30,16,24]; //duck left
 	animations[11] = [321,30,16,24]; // duck right
-
+var sJump = new Audio("audio/jump.wav");
 var currentAnimation = 0;
 var frame = 0;
 var inAnimation = 0;
@@ -74,6 +74,10 @@ function checkKeys()
 			currentAnimation = 5;
 			$('#luigi').css("left", "+=2");
 		}
+	}
+	else if(keyPressed["88"])
+	{
+		sJump.play();
 	}
 	else if(keyPressed["38"])
 	{
