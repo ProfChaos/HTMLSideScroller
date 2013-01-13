@@ -7,6 +7,11 @@ var animations = new Array();
 	animations[5] = [235,0,16,24, 264,0,16,24]; //walking left
 	animations[6] = [84,0,16,24, 112,0,16,24]; //walking left
 	animations[7] = [321,0,16,24, 348,0,16,24]; //walking left
+	animations[8] = [85,30,16,24]; //look up left
+	animations[9] = [348,30,16,24]; //look up right
+	animations[10] = [112,30,16,24]; //duck left
+	animations[11] = [321,30,16,24]; // duck right
+
 var currentAnimation = 0;
 var frame = 0;
 var inAnimation = 0;
@@ -20,7 +25,6 @@ function init()
 	}, false);
 	document.addEventListener('keyup', function(e) {
 		keyPressed[e.keyCode] = false;
-		alert();
 	}, false);
 	var winHeight = $('body').height();
 	$('#bg').css({"padding-top": ((winHeight/2)-360)+"px"})
@@ -73,17 +77,23 @@ function checkKeys()
 	}
 	else if(keyPressed["38"])
 	{
-
+		if(currentAnimation == 2 || currentAnimation == 8)
+			currentAnimation = 8;
+		else
+			currentAnimation = 9;
 	}
 	else if(keyPressed["40"])
 	{
-		
+		if(currentAnimation == 2 || currentAnimation == 10)
+			currentAnimation = 10;
+		else
+			currentAnimation = 11;
 	}
 	else
 	{
-		if(currentAnimation == 4 || currentAnimation == 6)
+		if(currentAnimation == 4 || currentAnimation == 6 || currentAnimation == 8 || currentAnimation == 10)
 			currentAnimation = 2;
-		else if(currentAnimation == 5 || currentAnimation == 7)
+		else if(currentAnimation == 5 || currentAnimation == 7 || currentAnimation == 9 || currentAnimation == 11)
 			currentAnimation = 3;
 	}
 }
