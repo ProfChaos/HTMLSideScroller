@@ -1,0 +1,40 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>Game</title>
+
+		<meta name="description" content="An easy to use CSS 3D slideshow tool for quickly creating good looking HTML presentations.">
+		<meta name="author" content="Jason Kadrmas">
+		<script type="text/javascript" src="./jquery.js"></script>
+		<script type="text/javascript" src="./main.js"></script>
+			
+		<style type="text/css">
+			html, body { background: #333; height: 100%; min-height: 100%; margin:0; padding: 0; }
+			#bg {
+			}
+			#window {
+				background: #fff;
+				height: 720px;
+				width: 1280px;
+				border-radius: 5px;
+				margin: 0 auto;
+				position: relative;
+				color: red;
+			}
+			#luigi {
+				bottom: 120px;
+			}
+		</style>
+	</head>
+<body onload="init()">
+	<div id="bg">
+		<div id="window">
+			<div id="frames"></div>
+			<div id="luigi" style="background-image:url('./img/luigi/sheet.png'); background-size:896px; width:40px; height:50px; position:absolute; left:0;"></div>
+			<div style="background-image:url('./img/brick.png'); background-size:32px; height:128px; position:absolute; bottom:0px; width:100%;"></div>
+		</div>
+	</div>
+</html>
