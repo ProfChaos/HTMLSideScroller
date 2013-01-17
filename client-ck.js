@@ -1,0 +1,1 @@
+function connect(){ws=new WebSocket("ws://127.0.0.1:1337");setTimeout(bindEvents,1e3);setReadyState()}function bindEvents(){ws.onopen=function(){log("onopen called");setReadyState()}}function setReadyState(){log("ws.readyState: "+ws.readyState)}function log(e){if(document.body){var t=document.createTextNode(e);document.body.appendChild(t)}}var ws=null;

@@ -1,0 +1,1 @@
+var net=require("net"),server=net.createServer(function(e){e.on("data",function(t){console.log("Got this data: "+t);e.write("You said: Hello")})});server.listen(1337,"127.0.0.1");
