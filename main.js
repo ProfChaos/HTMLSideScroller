@@ -4,27 +4,29 @@ animations[1] = [0, 30, 16, 24]; //idle left and right pressed
 animations[2] = [199, 0, 16, 24]; //idle left
 animations[3] = [235, 0, 16, 24]; //idle right
 animations[4] = [169, 0, 16, 24, 199, 0, 16, 24]; //walking left
-animations[5] = [235, 0, 16, 24,  264, 0, 16, 24]; //walking left
-animations[6] = [84, 0, 16, 24,  112, 0, 16, 24]; //walking left
-animations[7] = [321, 0, 16, 24,  348, 0, 16, 24]; //walking left
+animations[5] = [235, 0, 16, 24,  264, 0, 16, 24]; //walking right
+animations[6] = [84, 0, 16, 24,  112, 0, 16, 24]; //run left
+animations[7] = [321, 0, 16, 24,  348, 0, 16, 24]; //run right
 animations[8] = [85, 30, 16, 24]; //look up left
 animations[9] = [348, 30, 16, 24]; //look up right
 animations[10] = [112, 30, 16, 24]; //duck left
 animations[11] = [321, 30, 16, 24]; // duck right
+animations[12] = [54, 30, 16, 24]; //duck left
+animations[13] = [378, 30, 16, 24]; // duck right
 var sJump = new Audio("audio/jump.wav");
 var frame = 0;
 var keyPressed = {};
-var luigi = new Player();
 var GRAVITY = 9.81;
 
 function Player()
 {
-    this.x = 300;
+    this.x = 50;
     this.y = 400;
     this.height = 50;
     this.width = 40;
 
-    this.velocity = 0;
+    this.yVelocity = 0;
+    this.xVelocity = 0;
     this.currentAnimation = 0;
     this.inAnimation = 0;
     this.onTheGround = false;
@@ -34,10 +36,10 @@ Player.prototype.Jump = function()
     if (this.onTheGround)
     {
         sJump.play();
-        this.velocity = -20;
+        this.yVelocity = -20;
         this.onTheGround = false;
     }
-}
+};
 Player.prototype.CheckKeys = function()
 {
 
@@ -49,10 +51,10 @@ Player.prototype.CheckKeys = function()
         if(keyPressed["90"])
         {
             this.currentAnimation = 6;
-            $('#luigi').css("left", "-=4");
+            this.RunLeft(6);
         }else {
             this.currentAnimation = 4;
-            $('#luigi').css("left", "-=2");
+            this.RunLeft(2);
         }
         if(keyPressed["88"])
         {
@@ -64,10 +66,10 @@ Player.prototype.CheckKeys = function()
         if(keyPressed["90"])
         {
             this.currentAnimation = 7;
-            $('#luigi').css("left", "+=4");
+            this.RunRight(6);
         }else {
             this.currentAnimation = 5;
-            $('#luigi').css("left", "+=2");
+            this.RunRight(2);
         }
         if(keyPressed["88"])
         {
@@ -102,11 +104,20 @@ Player.prototype.CheckKeys = function()
     }
     else
     {
-        if(this.currentAnimation === 4 || this.currentAnimation === 6 || this.currentAnimation === 8 || this.currentAnimation === 10)
+        if((this.currentAnimation === 6 || this.currentAnimation === 12) && this.xVelocity !== 0)
+        {
+            this.currentAnimation = 12;
+            console.log("wooo");
+        }
+        else if((this.currentAnimation === 7 || this.currentAnimation === 13) && this.xVelocity !== 0)
+        {
+            this.currentAnimation = 13;
+        }
+        else if(this.currentAnimation === 4 || this.currentAnimation === 8 || this.currentAnimation === 10 || this.currentAnimation === 12)
         {
             this.currentAnimation = 2;
         }
-        else if(this.currentAnimation === 5 || this.currentAnimation === 7 || this.currentAnimation === 9 || this.currentAnimation === 11)
+        else if(this.currentAnimation === 5 || this.currentAnimation === 9 || this.currentAnimation === 11 || this.currentAnimation === 13)
         {
             this.currentAnimation = 3;
         }
@@ -131,32 +142,101 @@ Player.prototype.Update = function()
 {
     this.Gravity();
     this.Collision();
+    this.Friction();
     $('#luigi').css("top", this.y);
-}
+    $('#luigi').css("left", this.x);
+};
 
 Player.prototype.Gravity = function()
 {
 
-    this.velocity += GRAVITY * 0.1;
-    this.y += this.velocity * 1;
-}
+    this.yVelocity += GRAVITY * 0.1;
+    this.y += this.yVelocity * 1;
+};
+
+Player.prototype.RunRight = function(MAX) {
+    if (this.xVelocity < MAX)
+        this.xVelocity += 4;
+};
+Player.prototype.RunLeft = function(MIN) {
+    if (this.xVelocity > -MIN)
+        this.xVelocity -= 4;
+
+};
+Player.prototype.Friction = function()
+{
+    if(this.xVelocity < 0)
+    {
+        this.xVelocity += 0.5;
+        if(this.xVelocity > -1)
+            this.xVelocity = 0;
+        this.x += this.xVelocity;
+    }else if(this.xVelocity > 0)
+    {
+        this.xVelocity -= 0.5;
+        if(this.xVelocity < 1)
+            this.xVelocity = 0;
+        this.x += this.xVelocity;
+    }else {
+        this.xVelocity = 0;
+    }
+};
 Player.prototype.Collision = function()
 {
     var obj = this;
+    obj.onTheGround = false;
     $('.collidable').each(function(coll) {
         var top = parseInt($(this).css('top'), 10);
+        var bottom = parseInt($(this).css('top'), 10) + parseInt($(this).height(), 10);
+        var left = parseInt($(this).css('left'), 10);
+        var right = parseInt($(this).css('left'), 10) + parseInt($(this).width(), 10);
 
+        //console.log(coll+"objx"+right+"");
         //alert("top "+top+" objx "+ obj.y);
-        if((obj.y + obj.height) > top)
+        
+        if((obj.y + obj.height) > top && obj.x + obj.width >= left && obj.x<= right)
         {
-            if((obj.y + obj.height) < top + 50 && obj.velocity >= 0)
+            
+            if((obj.y + obj.height) < top + 50 && obj.yVelocity >= 0)
             {
-                obj.velocity = 0;
+                obj.yVelocity = 0;
                 obj.y = top - obj.height;
                 obj.onTheGround = true;
             }
+            else if(obj.y > bottom - 50 && obj.yVelocity < 0)
+            {
+                obj.yVelocity = 0;
+                obj.y = bottom + 10;
+            }
         }
+        else if(obj.xVelocity < 0 && obj.x - 10 < right && obj.x + obj.width > left && obj.y + obj.height > top && obj.y < bottom)
+        {
+            obj.x = right + 10;
+        }
+        else if(obj.xVelocity > 0 && obj.x + 5 < right  && obj.x + obj.width > left - 5 && obj.y + obj.height > top && obj.y < bottom)
+        {
+            obj.x = left - obj.width - 5;
+        } 
     });
+    if(obj.y > 720)
+    {
+        obj.y = 100;
+        obj.x = 200;
+        obj.yVelocity = 0;
+    }
+};
+
+var luigi = new Player();
+function draw()
+{
+    luigi.Animate(frame);
+
+    luigi.CheckKeys();
+
+    luigi.Update();
+
+    //$('#frames').html(frame);
+    frame += 1;
 }
 
 function init()
@@ -172,19 +252,3 @@ function init()
 
     return setInterval(draw ,16);
 }
-
-function draw()
-{
-    luigi.Animate(frame);
-
-    luigi.CheckKeys();
-
-    luigi.Update();
-
-    //$('#frames').html(frame);
-    frame += 1;
-}
-//function gravity(object)
-//{
-//    var GCONST = 9.81;
-//}

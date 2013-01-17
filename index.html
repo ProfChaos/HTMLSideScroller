@@ -23,9 +23,11 @@
 				margin: 0 auto;
 				position: relative;
 				color: red;
+				overflow: hidden;
 			}
 			#luigi {
 				top: 60px;
+				left: 0px;
 			}
 		</style>
 	</head>
@@ -33,8 +35,10 @@
 	<div id="bg">
 		<div id="window">
 			<div id="frames"></div>
-			<div id="luigi" style="background-image:url('./img/luigi/sheet.png'); background-size:896px; width:40px; height:50px; position:absolute; left:0;"></div>
-			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; height:128px; position:absolute; top:600px; width:100%;"></div>
+			<div id="luigi" style="background-image:url('./img/luigi/sheet.png'); background-size:896px; width:30px; height:50px; position:absolute; left:0;"></div>
+			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; position:absolute; height:100%; top:0px; left:-50px; width:32px;"></div>
+			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; position:absolute; height:64px;  top:450px; left:300px; width:32px;"></div>
+			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; height:128px; position:absolute; top:600px; width:1000px; left:0px;"></div>
 		</div>
 	</div>
 </html>
