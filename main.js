@@ -17,7 +17,7 @@ var sJump = new Audio("audio/jump.wav");
 var frame = 0;
 var keyPressed = {};
 var GRAVITY = 9.81;
-
+var conn;
 function Player()
 {
     this.x = 50;
@@ -130,7 +130,7 @@ Player.prototype.Animate = function(frame)
     {
         this.inAnimation = 0;
     }
-    $('#luigi').css({'background-position-x': "-"+animations[this.currentAnimation][this.inAnimation]*2+"px", 'background-position-y': "-"+animations[this.currentAnimation][this.inAnimation+1]*2+"px"});
+    $('#luigi').css('background-position', "-"+animations[this.currentAnimation][this.inAnimation]*2+"px -"+animations[this.currentAnimation][this.inAnimation+1]*2+"px");
     //$('#luigi').html(animations[this.currentAnimation][inAnimation]);
     if((frame % 10) === 0)
     {
@@ -239,8 +239,49 @@ function draw()
     frame += 1;
 }
 
+var conn = {},
+      serverUri = "ws://127.0.0.1:1337",
+      zombocom = $("#server"),
+      state = $("#state");
+
+    function openConnection() {
+        if (!conn.readyState || conn.readyState > 1) {
+
+            $("#server").append("connecting<br>");
+            conn = new WebSocket( serverUri );
+
+            conn.onopen = function () {
+                $("#server").append("websocket is open<br>");
+                conn.send("woop");
+            };
+
+            conn.onmessage = function( event ) {
+                zombocom.append(event.data || "");
+            };
+
+            conn.onclose = function( event ) {
+                zombocom.append("Socket Closed");
+                state.addClass("closed");
+            };
+            conn.onerror = function (error) {
+              console.log('WebSocket Error ' + error);
+            };
+        }
+    }
+function go()
+{
+    if (!!window.WebSocket) {
+        $("#server").append("websocket is a go<br>");
+        openConnection();
+    } else {
+        $("#server").append("Du er for dårligt at bruka websocket");
+    }
+}
+
 function init()
 {
+    //var worker = new Worker(go());
+    //  worker.postMessage();
     document.addEventListener('keydown', function(e) {
         keyPressed[e.keyCode] = true;
     }, false);
