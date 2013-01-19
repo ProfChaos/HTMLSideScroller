@@ -1,28 +1,30 @@
 var animations = [];
-animations[0] = [28, 0, 16, 24]; //idle start
-animations[1] = [0, 30, 16, 24]; //idle left and right pressed
-animations[2] = [199, 0, 16, 24]; //idle left
-animations[3] = [235, 0, 16, 24]; //idle right
-animations[4] = [169, 0, 16, 24, 199, 0, 16, 24]; //walking left
-animations[5] = [235, 0, 16, 24,  264, 0, 16, 24]; //walking right
-animations[6] = [84, 0, 16, 24,  112, 0, 16, 24]; //run left
-animations[7] = [321, 0, 16, 24,  348, 0, 16, 24]; //run right
-animations[8] = [85, 30, 16, 24]; //look up left
-animations[9] = [348, 30, 16, 24]; //look up right
-animations[10] = [112, 30, 16, 24]; //duck left
-animations[11] = [321, 30, 16, 24]; // duck right
-animations[12] = [54, 30, 16, 24]; //duck left
-animations[13] = [378, 30, 16, 24]; // duck right
+animations[0] = [28, 0, 14, 22]; //idle start
+animations[1] = [0, 30, 16, 22]; //idle left and right pressed
+animations[2] = [199, 0, 14, 22]; //idle left
+animations[3] = [235, 0, 14, 22]; //idle right
+animations[4] = [169, 0, 15, 22, 199, 0, 14, 22]; //walking left
+animations[5] = [235, 0, 15, 22,  264, 0, 14, 22]; //walking right
+animations[6] = [84, 0, 16, 22,  112, 0, 15, 22]; //run left
+animations[7] = [321, 0, 16, 22,  348, 0, 15, 22]; //run right
+animations[8] = [85, 30, 15, 22]; //look up left
+animations[9] = [348, 30, 15, 22]; //look up right
+animations[10] = [112, 34, 15, 14]; //duck left
+animations[11] = [321, 34, 15, 14]; // duck right
+animations[12] = [54, 29, 15, 24]; // stopping left
+animations[13] = [380, 29, 15, 24]; // stopping right
 var sJump = new Audio("audio/jump.wav");
 var frame = 0;
 var keyPressed = {};
 var GRAVITY = 9.81;
 var conn;
+var SCALE = 2;
+
 function Player()
 {
     this.x = 50;
     this.y = 400;
-    this.height = 50;
+    this.height = 45;
     this.width = 40;
 
     this.yVelocity = 0;
@@ -30,10 +32,16 @@ function Player()
     this.currentAnimation = 0;
     this.inAnimation = 0;
     this.onTheGround = false;
+    this.inWater = false;
 }
 Player.prototype.Jump = function()
 {
-    if (this.onTheGround)
+    if(this.inWater)
+    {
+        sJump.play();
+        this.yVelocity = -2;
+    }
+    else if (this.onTheGround)
     {
         sJump.play();
         this.yVelocity = -20;
@@ -56,6 +64,12 @@ Player.prototype.CheckKeys = function()
             this.currentAnimation = 4;
             this.RunLeft(2);
         }
+
+        if(!this.onTheGround && keyPressed["40"])
+        {
+            this.currentAnimation = 10;
+        }
+
         if(keyPressed["88"])
         {
             this.Jump();
@@ -71,6 +85,12 @@ Player.prototype.CheckKeys = function()
             this.currentAnimation = 5;
             this.RunRight(2);
         }
+
+        if(!this.onTheGround && keyPressed["40"])
+        {
+            this.currentAnimation = 11;
+        }
+
         if(keyPressed["88"])
         {
             this.Jump();
@@ -107,7 +127,6 @@ Player.prototype.CheckKeys = function()
         if((this.currentAnimation === 6 || this.currentAnimation === 12) && this.xVelocity !== 0)
         {
             this.currentAnimation = 12;
-            console.log("wooo");
         }
         else if((this.currentAnimation === 7 || this.currentAnimation === 13) && this.xVelocity !== 0)
         {
@@ -130,8 +149,14 @@ Player.prototype.Animate = function(frame)
     {
         this.inAnimation = 0;
     }
-    $('#luigi').css('background-position', "-"+animations[this.currentAnimation][this.inAnimation]*2+"px -"+animations[this.currentAnimation][this.inAnimation+1]*2+"px");
-    //$('#luigi').html(animations[this.currentAnimation][inAnimation]);
+    $('#luigi').css('background-position', "-"+animations[this.currentAnimation][this.inAnimation] * SCALE +"px -"+animations[this.currentAnimation][this.inAnimation+1] * SCALE + "px");
+
+    $('#luigi').width(animations[this.currentAnimation][this.inAnimation+2] * SCALE);
+    this.width = animations[this.currentAnimation][this.inAnimation+2] * SCALE;
+
+    $('#luigi').height(animations[this.currentAnimation][this.inAnimation+3] * SCALE);
+    this.height = animations[this.currentAnimation][this.inAnimation+3] * SCALE;
+
     if((frame % 10) === 0)
     {
         this.inAnimation+=4;
@@ -149,9 +174,17 @@ Player.prototype.Update = function()
 
 Player.prototype.Gravity = function()
 {
-
-    this.yVelocity += GRAVITY * 0.1;
-    this.y += this.yVelocity * 1;
+    if(this.inWater)
+    {
+        console.log("test");
+        this.yVelocity += GRAVITY * 0.01;
+        this.y += this.yVelocity * 1;
+    }
+    else
+    {
+        this.yVelocity += GRAVITY * 0.1;
+        this.y += this.yVelocity * 1;
+    }
 };
 
 Player.prototype.RunRight = function(MAX) {
@@ -185,6 +218,7 @@ Player.prototype.Collision = function()
 {
     var obj = this;
     obj.onTheGround = false;
+    obj.inWater = false;
     $('.collidable').each(function(coll) {
         var top = parseInt($(this).css('top'), 10);
         var bottom = parseInt($(this).css('top'), 10) + parseInt($(this).height(), 10);
@@ -218,6 +252,27 @@ Player.prototype.Collision = function()
             obj.x = left - obj.width - 5;
         } 
     });
+
+    $('.water').each(function(coll) {
+
+        var top = parseInt($(this).css('top'), 10);
+        var bottom = parseInt($(this).css('top'), 10) + parseInt($(this).height(), 10);
+        var left = parseInt($(this).css('left'), 10);
+        var right = parseInt($(this).css('left'), 10) + parseInt($(this).width(), 10);
+
+        if(obj.y + obj.height > top && obj.y < bottom && obj.x > left && obj.x < right)
+        {
+            obj.inWater = true;
+            console.log("inwater");
+
+        }
+
+        if((obj.y + obj.height) > top - 10)
+        {
+            obj.onTheGround = true;    
+        }
+    });
+
     if(obj.y > 720)
     {
         obj.y = 100;
@@ -237,45 +292,6 @@ function draw()
 
     //$('#frames').html(frame);
     frame += 1;
-}
-
-var conn = {},
-      serverUri = "ws://127.0.0.1:1337",
-      zombocom = $("#server"),
-      state = $("#state");
-
-    function openConnection() {
-        if (!conn.readyState || conn.readyState > 1) {
-
-            $("#server").append("connecting<br>");
-            conn = new WebSocket( serverUri );
-
-            conn.onopen = function () {
-                $("#server").append("websocket is open<br>");
-                conn.send("woop");
-            };
-
-            conn.onmessage = function( event ) {
-                zombocom.append(event.data || "");
-            };
-
-            conn.onclose = function( event ) {
-                zombocom.append("Socket Closed");
-                state.addClass("closed");
-            };
-            conn.onerror = function (error) {
-              console.log('WebSocket Error ' + error);
-            };
-        }
-    }
-function go()
-{
-    if (!!window.WebSocket) {
-        $("#server").append("websocket is a go<br>");
-        openConnection();
-    } else {
-        $("#server").append("Du er for dårligt at bruka websocket");
-    }
 }
 
 function init()

@@ -9,7 +9,7 @@
 		<meta name="description" content="An easy to use CSS 3D slideshow tool for quickly creating good looking HTML presentations.">
 		<meta name="author" content="Jason Kadrmas">
 		<script type="text/javascript" src="./jquery.js"></script>
-		<script type="text/javascript" src="./client.js"></script>
+		<script type="text/javascript" src="./main.js"></script>
 			
 		<style type="text/css">
 			html, body { background: #333; height: 100%; min-height: 100%; margin:0; padding: 0; }
@@ -29,7 +29,7 @@
 			#luigi {
 				top: 60px;
 				left: 0px;
-				border: 1px dashed red;
+				/*border: 1px dashed red;*/
 			}
 			#server {
 				background:rgba(0,0,0,0.8);
@@ -45,16 +45,26 @@
 				background: green;
 
 			}
+			.water 
+			{
+				background: rgba(0,0,255,0.2);
+				width: 280px;
+				height: 110px;
+				position: absolute;
+				top: 620px;
+				left: 1000px;
+			}
 		</style>
 	</head>
-<body onload="connect()">
+<body onload="init()">
 	<div id="bg">
 		<div id="window">
 			<div id="frames"></div>
-			<div id="luigi" style="background-image:url('./img/luigi/sheet.png'); background-size:896px; width:30px; height:50px; position:absolute; left:0;"></div>
+			<div id="luigi" style="background-image:url('./img/luigi/sheet.png'); background-size:896px; width:30px; height:45px; position:absolute; left:0;"></div>
 			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; position:absolute; height:100%; top:0px; left:-50px; width:32px;"></div>
 			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; position:absolute; height:64px;  top:450px; left:300px; width:32px;"></div>
 			<div class="collidable" style="background-image:url('./img/brick.png'); background-size:32px; height:128px; position:absolute; top:600px; width:1000px; left:0px;"></div>
+			<div class="water"></div>
 			<div id="server"></div>
 			<div id="state"></div>
 		</div>
